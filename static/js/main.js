@@ -212,9 +212,41 @@ async function renderChartOnDemand(chartOptions) {
   )
 }
 
+function _getTweet(tweetId, tweetElementId) {
+  let tweet = document.getElementById(tweetElementId)
+  const id = tweetId
+  twttr.widgets.createTweet(
+    id, tweet,
+    {
+      conversation : 'none',    // or all
+      cards        : 'hidden',  // or visible
+      linkColor    : '#cc0000', // default is blue
+      theme        : 'light'    // or dark
+    })
+}
+
+function getTopTweets(spinnerId) {
+  // Tweet ids are queried from Flask backend as top retweeted tweets
+  const response = fetch(`/top_retweets`)
+  const topTweetIds = response.json()
+  const tweetElementIdPrefix = "top-retweet-"
+  for (const [i, tweetId] of topTweetIds.entries()) {
+    const tweetElementId = `${tweetElementIdPrefix}${i+1}`
+    _getTweet(tweetId, tweetElementId)
+  }
+  // Remove spinner
+  const loadingSpinner = document.getElementById(spinnerId);
+  if (loadingSpinner) {
+    loadingSpinner.parentNode.removeChild(loadingSpinner);
+  }
+}
+
 function getLiveInfo() {
   getYangTweetCount()
   getTweetStream()
+
+  // Top tweets
+  const topTweets = getTopTweets("top-retweets-loading")
 
   // Charts
   const yangMChart = renderChartOnDemand({

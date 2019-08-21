@@ -22,6 +22,7 @@
     integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
     crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.js"></script>
+  <script sync src="https://platform.twitter.com/widgets.js"></script>
   <!-- Main JavaScript code -->
   <script src="../static/js/main.js"></script>
 </head>
@@ -121,25 +122,59 @@
 
       <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
         <li class="nav-item">
-          <a class="nav-link active" id="pills-yang-tab" data-toggle="pill" href="#pills-yang" role="tab"
+          <a class="nav-link active" id="pills-top-retweets-tab" data-toggle="pill" href="#pills-top-retweets" role="tab"
+            aria-controls="pills-top-retweets" aria-selected="true">Top Related Tweets</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="pills-yang-tab" data-toggle="pill" href="#pills-yang" role="tab"
             aria-controls="pills-yang" aria-selected="true">Metrics</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" id="pills-cardano-tab" data-toggle="pill" href="#pills-cardano" role="tab"
-            aria-controls="pills-cardano" aria-selected="false">Twitter Sentiment</a>
+          <a class="nav-link" id="pills-sentiment-tab" data-toggle="pill" href="#pills-sentiment" role="tab"
+            aria-controls="pills-sentiment" aria-selected="false">Twitter Sentiment</a>
         </li>
       </ul>
 
       <br />
-        <p style="text-align: center;">
-          Trendline is <span style="color: green;">green</span> for positive and
-          <span style="color: red;">red</span> for negative. All timestamps in US Eastern timezone
-        </p>
       <br />
 
       <div class="tab-content" id="pills-tabContent">
-        <div class="tab-pane fade show active" id="pills-yang" role="tabpanel" aria-labelledby="pills-yang-tab">
+        <div class="tab-pane fade show active" id="pills-top-retweets" role="tabpanel" aria-labelledby="pills-top-retweets-tab">
+          <p style="text-align: center;">
+            Top Retweeted Tweets in the last 6hr
+          </p>
 
+          <div class="spinner-grow text-primary" id="top-retweets-loading" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
+
+          <div class="row-4" id="top-retweet-1">
+            Loading top-retweet-1...
+          </div>
+          <div class="row-4" id="top-retweet-2">
+            Loading top-retweet-2...
+          </div>
+          <div class="row-4" id="top-retweet-3">
+            Loading top-retweet-3...
+          </div>
+          <div class="row-4" id="top-retweet-4">
+            Loading top-retweet-4...
+          </div>
+          <div class="row-4" id="top-retweet-5">
+            Loading top-retweet-5...
+          </div>
+          <div class="row-4" id="top-retweet-6">
+            Loading top-retweet-6...
+          </div>
+        </div>
+
+
+        <div class="tab-pane fade" id="pills-yang" role="tabpanel" aria-labelledby="pills-yang-tab">
+          <p style="text-align: center;">
+            Trendline is <span style="color: green;">green</span> for positive and
+            <span style="color: red;">red</span> for negative, and <span style="color: grey;">grey</span> for no significant change.
+            All time in US Eastern timezone
+          </p>
           <div class="row-4" id="yang-minute-chart">
             <div class="spinner-grow text-primary" id="yang-minute-loading" role="status">
               <span class="sr-only">Loading...</span>
@@ -164,12 +199,17 @@
           </div> -->
         </div>
 
-        <div class="tab-pane fade" id="pills-cardano" role="tabpanel" aria-labelledby="pills-cardano-tab">
+        <div class="tab-pane fade" id="pills-sentiment" role="tabpanel" aria-labelledby="pills-sentiment-tab">
+          <p style="text-align: center;">
+            Trendline is <span style="color: green;">green</span> for positive and
+            <span style="color: red;">red</span> for negative, and <span style="color: grey;">grey</span> for no significant change.
+            All time in US Eastern timezone
+          </p>
           <div class="row-4">
-            <canvas id="cardano-minute-count-line" height="250"></canvas>
+            <canvas id="sentiment-minute-count-line" height="250"></canvas>
           </div>
           <div class="row-4">
-            <canvas id="cardano-day-count-line" height="250"></canvas>
+            <canvas id="sentiment-day-count-line" height="250"></canvas>
           </div>
 
           <!-- <div class="row">
