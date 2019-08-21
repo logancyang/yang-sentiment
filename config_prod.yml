@@ -1,0 +1,10 @@
+flask:
+  secret_key: adsjfaoisdjfioasdjfiasdjf
+
+db:
+  url: >
+    postgresql+psycopg2://dukelolo_crypto:h3v5H8R9@crypto-sentiment-db
+    .cjnd7boyg5li.us-east-1.rds.amazonaws.com:5432/crypto_sentiment_db
+
+cache:
+  url: ./cache.sqlite

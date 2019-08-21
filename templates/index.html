@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <link rel="shortcut icon" href="../static/favicon.ico">
+  <title>Andrew Yang Trend</title>
+  <!-- Bootstrap CSS, JS, and jQuery -->
+  <!-- Latest compiled and minified CSS -->
+  <!-- Bootstrap CSS, JS, and jQuery -->
+  <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
+    integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous"> -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <!-- Need to hard refresh to reflect changes in the linked css -->
+  <link rel="stylesheet" href="../static/css/style.css" />
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+    integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+    integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"
+    integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.js"></script>
+  <!-- Main JavaScript code -->
+  <script src="../static/js/main.js"></script>
+</head>
+
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <!-- TYPICALLY WE HAVE A BRAND LINK -->
+    <a class="navbar-brand" href="">ANDREW YANG TREND</a>
+
+    <!-- THIS SETS UP THE COLLAPSABLE BUTTON ELEMENT (HAMBURGER) -->
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- THEN WE PUT AN UNORDERED LIST INSIDE OF A COLLAPSE DIV -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="about">About</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <br />
+  <br />
+
+  <div class="container">
+    <!-- Live tweet and stats main panel -->
+    <div class="d-flex flex-column justify-content-center" style="height: 450px;">
+      <div class="row align-items-center">
+        <div class="col-7 justify-content-center text-center bg-light">
+          <div class="tweet-stream">
+            <blockquote class="twitter-tweet" id="tweet-1">
+              <div class="spinner-grow text-dark" role="status">
+                <span class="sr-only">Loading...</span>
+              </div>
+            </blockquote>
+            <br />
+            <blockquote class="twitter-tweet" id="tweet-2">
+              <div class="spinner-grow text-dark" role="status">
+                <span class="sr-only">Loading...</span>
+              </div>
+            </blockquote>
+            <br />
+            <blockquote class="twitter-tweet" id="tweet-3">
+              <div class="spinner-grow text-dark" role="status">
+                <span class="sr-only">Loading...</span>
+              </div>
+            </blockquote>
+            <br />
+            <blockquote class="twitter-tweet" id="tweet-4">
+              <div class="spinner-grow text-dark" role="status">
+                <span class="sr-only">Loading...</span>
+              </div>
+            </blockquote>
+            <br />
+            <blockquote class="twitter-tweet" id="tweet-5">
+              <div class="spinner-grow text-dark" role="status">
+                <span class="sr-only">Loading...</span>
+              </div>
+            </blockquote>
+          </div>
+        </div>
+
+        <div class="col justify-content-center text-center">
+          <div class="row">
+            <div class="col justify-content-center text-center">
+              <h6>Andrew Yang related tweets today</h6>
+              <div class="yang-count" style="text-align: center; font-size: 40px;">
+                <div class="spinner-grow text-dark" role="status">
+                  <span class="sr-only">Loading...</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <br />
+          <br />
+
+        </div>
+      </div>
+    </div>
+
+    <br />
+    <br />
+    <br />
+
+    <!-- Charts and content main panel -->
+    <div class="container">
+
+      <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link active" id="pills-yang-tab" data-toggle="pill" href="#pills-yang" role="tab"
+            aria-controls="pills-yang" aria-selected="true">Metrics</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="pills-cardano-tab" data-toggle="pill" href="#pills-cardano" role="tab"
+            aria-controls="pills-cardano" aria-selected="false">Twitter Sentiment</a>
+        </li>
+      </ul>
+
+      <br />
+        <p style="text-align: center;">
+          Trendline is <span style="color: green;">green</span> for positive and
+          <span style="color: red;">red</span> for negative. All timestamps in US Eastern timezone
+        </p>
+      <br />
+
+      <div class="tab-content" id="pills-tabContent">
+        <div class="tab-pane fade show active" id="pills-yang" role="tabpanel" aria-labelledby="pills-yang-tab">
+
+          <div class="row-4" id="yang-minute-chart">
+            <div class="spinner-grow text-primary" id="yang-minute-loading" role="status">
+              <span class="sr-only">Loading...</span>
+            </div>
+            <canvas id="yang-minute-count-line" height="250"></canvas>
+          </div>
+          <div class="row-4" id="yang-day-chart">
+            <div class="spinner-grow text-primary" id="yang-day-loading" role="status">
+              <span class="sr-only">Loading...</span>
+            </div>
+            <canvas id="yang-day-count-line" height="250"></canvas>
+          </div>
+
+
+          <!-- <div class="row">
+            <div class="col">
+              <canvas id="loc-count-hist" height="250"></canvas>
+            </div>
+            <div class="col">
+              <canvas id="loc1-count-hist" height="250"></canvas>
+            </div>
+          </div> -->
+        </div>
+
+        <div class="tab-pane fade" id="pills-cardano" role="tabpanel" aria-labelledby="pills-cardano-tab">
+          <div class="row-4">
+            <canvas id="cardano-minute-count-line" height="250"></canvas>
+          </div>
+          <div class="row-4">
+            <canvas id="cardano-day-count-line" height="250"></canvas>
+          </div>
+
+          <!-- <div class="row">
+            <div class="col">
+              <canvas id="loc-count-hist" height="250"></canvas>
+            </div>
+            <div class="col">
+              <canvas id="loc1-count-hist" height="250"></canvas>
+            </div>
+          </div> -->
+        </div>
+      </div>
+
+    </div>
+    <canvas id="canvas"></canvas>
+    <footer style="text-align: right">By <a href="http://loganyang.me">Logan Yang</a></footer>
+  </div>
+</body>
+
+</html>

@@ -1,0 +1,8 @@
+flask:
+  secret_key: adsjfaoisdjfioasdjfiasdjf
+
+db:
+  url: sqlite:////Users/chaoyang/webapps/ada-sentiment/db.sqlite
+
+cache:
+  url: ./cache.sqlite

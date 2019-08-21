@@ -1,0 +1,1 @@
+web: gunicorn --worker-class=gevent -w 4 -t 99999 application:app -b 0.0.0.0:$PORT
