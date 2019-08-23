@@ -41,3 +41,24 @@ eb deploy
 ```
 
 The change will be live on http://www.andrewyangtrend.com after a couple of minutes.
+
+
+## References
+
+- Twitter API Tweet Object
+    - https://developer.twitter.com/en/docs/tweets/data-dictionary/overview/tweet-object
+- AWS Elastic Beanstalk CLI
+    - https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/eb-cli3.html
+- AWS RDS Database Monitoring and Performance Check
+    - https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Monitoring.html
+- Alembic Database Autogenerate Migration
+    - https://alembic.sqlalchemy.org/en/latest/autogenerate.html
+- Statsmodels Linear Regression Coefficients and P-values
+    - https://stackoverflow.com/questions/47388258/how-to-extract-the-regression-coefficient-from-statsmodels-api
+    - https://stackoverflow.com/questions/41075098/how-to-get-the-p-value-in-a-variable-from-olsresults-in-python
+- Wordcloud
+    - http://amueller.github.io/word_cloud/auto_examples/simple.html#sphx-glr-auto-examples-simple-py
+- Add HTTPS to your website
+- Add Google Analytics to your website
+- AWS Kinesis Firehose
+- AWS Elasticsearch
