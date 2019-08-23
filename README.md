@@ -25,7 +25,7 @@ Sometimes there are issues which only can be found on the server side, such as t
 place to test it. With the `Procfile` and automatic deployment from Github setup, we can deploy to Heroku by simply
 `git push -u origin master`.
 
-Heroku app url: TBD
+Heroku app url: https://andrewyangtrend.herokuapp.com/
 
 
 ## Production: Deploy to AWS Beanstalk
