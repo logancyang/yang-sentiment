@@ -13,7 +13,7 @@ from learning.regression import linear_regression
 from models import Tweet, Price
 from queries import (
     query_last_n, query_tweet_count, get_eastern_date_today,
-    query_count_6hr_at_5min, query_count_14d_at_1d
+    query_count_nhr_at_xmin, query_count_14d_at_1d, query_retweet_count
 )
 from settings import PORT, DB_USER, DB_PASSWORD, RDS_POSTGRES_ENDPOINT, DB_NAME
 
@@ -63,7 +63,22 @@ def latest_tweets():
 
 @app.route('/top_retweets')
 def top_retweets():
-    top_retweet_ids = ["1164295013423091712", "1164886394407444480"]
+    colname = "retweeted_status_id_str"
+    query = query_retweet_count(colname)
+    top_retweet_ids = []
+
+    with SqliteDict('./cache.sqlite') as cache:
+        if query not in cache:
+            logging.info(f"Cache MISS: {query}\n\n")
+            top_retweet_ids_raw = db.session.query(colname).from_statement(text(query)).all()
+            top_retweet_ids = [tup[0] for tup in top_retweet_ids_raw]
+            db.session.commit()
+            cache[query] = top_retweet_ids
+            cache.commit()
+        else:
+            logging.info(f"Cache HIT: {query}\n\n")
+            top_retweet_ids = cache[query]
+
     response = app.response_class(
             response=json.dumps(top_retweet_ids),
             status=200,
@@ -81,7 +96,7 @@ def tweets_min_chart():
     Get the counts of tweets for the last 6hr at 5min granularity
     A total 72 data points - the last 5 min = 71 data points
     """
-    return _tweets_chart_request(chart_type='6hr_at_5min')
+    return _tweets_chart_request(chart_type='72hr_at_1hr')
 
 
 # pylint: disable=no-member
@@ -153,10 +168,11 @@ def _tweets_chart_request(chart_type, track_term=YANG_TERM):
         query = query_count_14d_at_1d(
             track_term, count_colname=count_colname, interval_colname=interval_colname)
         # logging.info(f"[14d_at_1d SQL]: {query}")
-    elif chart_type == '6hr_at_5min':
-        query = query_count_6hr_at_5min(
-            track_term, count_colname=count_colname, interval_colname=interval_colname)
-        # logging.info(f"[6hr_at_5min SQL]: {query}\n\n")
+    elif chart_type == '72hr_at_1hr':
+        query = query_count_nhr_at_xmin(
+            n_hours=72, x_mins=60, track_term=track_term,
+            count_colname=count_colname, interval_colname=interval_colname)
+        # logging.info(f"[72hr_at_1hr SQL]: {query}\n\n")
     else:
         raise Exception(f"chart_type is not supported: {chart_type} ")
 

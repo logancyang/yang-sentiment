@@ -14,14 +14,28 @@ def query_tweet_count(track_term, created_date):
             f"created_date = '{created_date}';")
 
 
-def query_count_6hr_at_5min(coin_type, count_colname, interval_colname):
-    dt_6hr_ago = datetime.now() - timedelta(hours=6)
-    epochms_6hr_ago = dt_6hr_ago.timestamp() // 300 * 300 * 1000
-    fivemin_in_seconds = 60 * 5
+def query_retweet_count(colname='retweeted_status_id_str', track_term='andrewyang', top_n=6, n_hours=6):
+    """Query top n retweeted tweet ids for the last n_hours, refresh every 30min"""
+    dt_nhr_ago = datetime.now() - timedelta(hours=n_hours)
+    thirtymin_in_seconds = 30 * 60
+    epochms_nhr_ago = dt_nhr_ago.timestamp() // thirtymin_in_seconds * thirtymin_in_seconds * 1000
+    return (f"SELECT COUNT(*), {colname} "
+            f"FROM crypto_tweets "
+            f"WHERE inserted_at::bigint >= {epochms_nhr_ago} "
+            f"AND track_term = '{track_term}' "
+            f"AND {colname} is not NULL "
+            f"GROUP BY {colname} "
+            f"ORDER BY COUNT(*) DESC LIMIT {top_n}")
+
+
+def query_count_nhr_at_xmin(n_hours, x_mins, track_term, count_colname, interval_colname):
+    dt_nhr_ago = datetime.now() - timedelta(hours=n_hours)
+    xmin_in_seconds = 60 * x_mins
+    epochms_nhr_ago = dt_nhr_ago.timestamp() // xmin_in_seconds * xmin_in_seconds * 1000
     return _query_count_period_at_granularity(
-        coin_type,
-        period_start=epochms_6hr_ago,
-        granularity=fivemin_in_seconds,
+        track_term,
+        period_start=epochms_nhr_ago,
+        granularity=xmin_in_seconds,
         count_colname=count_colname,
         interval_colname=interval_colname
     )
@@ -44,14 +58,14 @@ def query_count_14d_at_1d(coin_type, count_colname, interval_colname):
 
 
 def _query_count_period_at_granularity(
-        coin_type, period_start, granularity, count_colname, interval_colname
+        track_term, period_start, granularity, count_colname, interval_colname
 ):
     granularity_ms = granularity * 1000
     return (f"SELECT COUNT(*) {count_colname}, "
             f"to_timestamp(floor((inserted_at::bigint / {granularity_ms} )) * {granularity}) "
             f"AT TIME ZONE 'US/Eastern' as {interval_colname} "
             f"FROM crypto_tweets "
-            f"WHERE inserted_at::bigint >= {period_start} AND track_term = '{coin_type}' "
+            f"WHERE inserted_at::bigint >= {period_start} AND track_term = '{track_term}' "
             f"GROUP BY {interval_colname}")
 
 

@@ -219,7 +219,7 @@ function _getTweet(tweetId, tweetElementId) {
     id, tweet,
     {
       conversation : 'none',    // or all
-      cards        : 'hidden',  // or visible
+      cards        : 'visible',  // or hidden
       linkColor    : '#cc0000', // default is blue
       theme        : 'light'    // or dark
     })
@@ -254,7 +254,7 @@ function getLiveInfo() {
     spinnerId: "yang-minute-loading",
     endpoint: "tweets_min_chart",
     chartType: "line",
-    title: "# yang tweets in the last 6hr",
+    title: "# yang related tweets last 72hr",
     color: 'blue',
     xTickType: 'minute',
     lastExclusive: true
@@ -265,7 +265,7 @@ function getLiveInfo() {
     spinnerId: "yang-day-loading",
     endpoint: "tweets_daily_chart",
     chartType: "line",
-    title: "# yang tweets in the last 2 weeks",
+    title: "# yang related tweets last 2 weeks",
     color: 'yellow',
     xTickType: 'day',
     lastExclusive: true
