@@ -1,9 +1,9 @@
-# Live Bitcoin and Cardano Tweet Sentiment Dashboard
+# Live Tweet Sentiment Dashboard For Andrew Yang
 
-This is a Flask app visualizing statistics and sentiment for tweets about the cryptocurrencies
-bitcoin and cardano.
+This is a Flask app visualizing statistics and sentiment for tweets about Andrew Yang, the 2020 presidential candidate.
 
-There is a streaming job that streams live tweets about bitcoin and cardano to an AWS RDS Postgres database.
+There is a streaming job that streams live tweets about Andrew Yang, Yang Gang and the Freedom Dividend to an AWS RDS Postgres database.
+
 This Flask app consumes data in that database.
 
 ## Development
@@ -25,14 +25,14 @@ Sometimes there are issues which only can be found on the server side, such as t
 place to test it. With the `Procfile` and automatic deployment from Github setup, we can deploy to Heroku by simply
 `git push -u origin master`.
 
-Heroku app url: https://crypto-sentiment-board.herokuapp.com/
+Heroku app url: TBD
 
 
 ## Production: Deploy to AWS Beanstalk
 
 Refer to EB CLI instruction about how to setup and initialize an EB project properly.
 
-This time I'm using GoDaddy domain name and setting name servers in AWS Route 53. It was not easy to make it work. Next time, directly register/buy domain names in AWS Route 53!
+I'm using AWS Route 53 domain name and setting name servers in AWS Route 53 as well. GoDaddy is not the best experience, go with AWS Route 53 for domain names.
 
 After proper setup, to make update to the app, simply commit the code and run
 
@@ -40,4 +40,4 @@ After proper setup, to make update to the app, simply commit the code and run
 eb deploy
 ```
 
-The change will be live on http://cryptosentiment.co after a couple of minutes.
+The change will be live on http://www.andrewyangtrend.com after a couple of minutes.
