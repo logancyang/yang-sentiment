@@ -225,10 +225,10 @@ function _getTweet(tweetId, tweetElementId) {
     })
 }
 
-function getTopTweets(spinnerId) {
+async function getTopTweets(spinnerId) {
   // Tweet ids are queried from Flask backend as top retweeted tweets
-  const response = fetch(`/top_retweets`)
-  const topTweetIds = response.json()
+  const response = await fetch(`/top_retweets`)
+  const topTweetIds = await response.json()
   const tweetElementIdPrefix = "top-retweet-"
   for (const [i, tweetId] of topTweetIds.entries()) {
     const tweetElementId = `${tweetElementIdPrefix}${i+1}`

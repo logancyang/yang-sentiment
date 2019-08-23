@@ -61,6 +61,17 @@ def latest_tweets():
     )
 
 
+@app.route('/top_retweets')
+def top_retweets():
+    top_retweet_ids = ["1164295013423091712", "1164886394407444480"]
+    response = app.response_class(
+            response=json.dumps(top_retweet_ids),
+            status=200,
+            mimetype='application/json'
+        )
+    return response
+
+
 """Charts"""
 
 
