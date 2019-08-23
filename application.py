@@ -64,7 +64,8 @@ def latest_tweets():
 @app.route('/top_retweets')
 def top_retweets():
     colname = "retweeted_status_id_str"
-    query = query_retweet_count(colname)
+    # Return top 10 retweeted tweet ids
+    query = query_retweet_count(colname, top_n=10)
     top_retweet_ids = []
 
     with SqliteDict('./cache.sqlite') as cache:

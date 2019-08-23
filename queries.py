@@ -14,7 +14,7 @@ def query_tweet_count(track_term, created_date):
             f"created_date = '{created_date}';")
 
 
-def query_retweet_count(colname='retweeted_status_id_str', track_term='andrewyang', top_n=6, n_hours=6):
+def query_retweet_count(colname='retweeted_status_id_str', track_term='andrewyang', top_n=10, n_hours=6):
     """Query top n retweeted tweet ids for the last n_hours, refresh every 30min"""
     dt_nhr_ago = datetime.now() - timedelta(hours=n_hours)
     thirtymin_in_seconds = 30 * 60
