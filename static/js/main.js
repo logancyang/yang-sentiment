@@ -105,7 +105,7 @@ function _getMinMaxYValue(datasets) {
  *   timestamps: [x, x, x, ...],
  *   counts: [y, y, ...],
  *   trendline: [y, y, y, ...],
- *   trend: true / false
+ *   trend: 1, 0, -1
  * }
  * @param {string} xTickType Can be 'minute' or 'day'
  */
@@ -197,7 +197,12 @@ async function renderChartOnDemand(chartOptions) {
     data: chartDataRaw,
     title
   }
-  const trendColor = chartDataRaw.trend ? 'green' : 'red'
+  let trendColor = 'grey'
+  if (chartDataRaw.trend === 1) {
+    trendColor = 'green'
+  } else if (chartDataRaw.trend === -1) {
+    trendColor = 'red'
+  }
   const loadingSpinner = document.getElementById(spinnerId);
   if (loadingSpinner) {
     loadingSpinner.parentNode.removeChild(loadingSpinner);

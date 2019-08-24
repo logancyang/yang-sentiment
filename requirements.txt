@@ -55,6 +55,7 @@ six==1.11.0
 sklearn==0.0
 SQLAlchemy==1.3.5
 sqlitedict==1.6.0
+statsmodels
 termcolor==1.1.0
 texttable==0.9.1
 TwitterAPI==2.5.9

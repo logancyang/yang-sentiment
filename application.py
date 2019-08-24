@@ -192,8 +192,8 @@ def _tweets_chart_request(chart_type, track_term=YANG_TERM):
         # Deploy the following line to staging if there's a date discrepancy at remote
         # logging.info(f"[Query RESULT]: {counts_raw}\n\n")
         timestamps, counts_data = _convert_counts_interval_data(counts_raw)
-        # trend_y_list: list of predicted value, trend: bool whether positive
-        trend_y_list, trend = linear_regression(X=timestamps, y=counts_data)
+        # trend_y_list: list of predicted value, trend: 0 for insignif, 1 for positive, -1 for negative
+        trend_y_list, trend = linear_regression(t=timestamps, y=counts_data)
         resp_dict = {
             'timestamps': timestamps,
             'counts': counts_data,
