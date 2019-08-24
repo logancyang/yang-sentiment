@@ -46,6 +46,10 @@ function getColor(colorKey) {
     'orange': {
       backgroundColor: 'rgba(255, 159, 64, 0.2)',
       borderColor: 'rgba(255, 159, 64, 1)'
+    },
+    'grey': {
+      backgroundColor: 'rgba(189, 195, 199, 0.2)',
+      borderColor: 'rgba(189, 195, 199, 1)'
     }
   }
   return colorSets[colorKey]
