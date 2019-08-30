@@ -72,14 +72,14 @@ def top_retweets():
 
     with SqliteDict('./cache.sqlite') as cache:
         if query not in cache:
-            logging.info(f"Cache MISS: {query}\n\n")
+            logging.info(f"Cache MISS: {query}")
             top_retweet_ids_raw = db.session.query(colname).from_statement(text(query)).all()
             top_retweet_ids = [tup[0] for tup in top_retweet_ids_raw]
             db.session.commit()
             cache[query] = top_retweet_ids
             cache.commit()
         else:
-            logging.info(f"Cache HIT: {query}\n\n")
+            logging.info(f"Cache HIT: {query}")
             top_retweet_ids = cache[query]
 
     response = app.response_class(
@@ -182,14 +182,14 @@ def _tweets_chart_request(chart_type, track_term=YANG_TERM):
     try:
         with SqliteDict('./cache.sqlite') as cache:
             if query not in cache:
-                logging.info(f"Cache MISS: {query}\n\n")
+                logging.info(f"Cache MISS: {query}")
                 counts_raw = db.session.query(
                     interval_colname, count_colname).from_statement(text(query)).all()
                 db.session.commit()
                 cache[query] = counts_raw
                 cache.commit()
             else:
-                logging.info(f"Cache HIT: {query}\n\n")
+                logging.info(f"Cache HIT: {query}")
                 counts_raw = cache[query]
         # Deploy the following line to staging if there's a date discrepancy at remote
         # logging.info(f"[Query RESULT]: {counts_raw}\n\n")

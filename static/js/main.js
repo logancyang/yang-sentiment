@@ -274,10 +274,22 @@ function getLiveInfo() {
     spinnerId: "yang-day-loading",
     endpoint: "tweets_daily_chart",
     chartType: "line",
-    title: "# yang related tweets last 2 weeks subject to data availability",
+    title: "# yang related tweets last 2 weeks (subject to data availability)",
     color: 'yellow',
     xTickType: 'day',
     lastExclusive: true
+  })
+
+  // TODO: Implement location hist for last 2 weeks data
+  const yangLocChart = renderChartOnDemand({
+    chartId: "yang-loc-count-bar",
+    spinnerId: "yang-loc-loading",
+    endpoint: "tweets_loc_chart",
+    chartType: "bar",
+    title: "# yang related tweets last 2 weeks based on location (subject to data availability)",
+    color: 'purple',
+    xTickType: 'location',
+    lastExclusive: false
   })
 
   // renderCharts('day-count-line', chartData=myChartData, colors=['blue', 'yellow'])
