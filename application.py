@@ -1,6 +1,7 @@
 import logging
 import time
 import json
+from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime
 from flask import Flask, render_template, Response, stream_with_context
 from flask_sqlalchemy import SQLAlchemy
@@ -46,7 +47,7 @@ def about():
 
 
 @app.route('/yangcount')
-def btccount():
+def yangcount():
     return Response(
         stream_with_context(_count_stream(YANG_TERM)),
         mimetype='text/event-stream'
@@ -63,6 +64,7 @@ def latest_tweets():
 
 @app.route('/top_retweets')
 def top_retweets():
+    """Top retweeted tweet ids, refresh every 30min based on the query granularity"""
     colname = "retweeted_status_id_str"
     # Return top 10 retweeted tweet ids
     query = query_retweet_count(colname, top_n=10)
@@ -193,7 +195,7 @@ def _tweets_chart_request(chart_type, track_term=YANG_TERM):
         # logging.info(f"[Query RESULT]: {counts_raw}\n\n")
         timestamps, counts_data = _convert_counts_interval_data(counts_raw)
         # trend_y_list: list of predicted value, trend: 0 for insignif, 1 for positive, -1 for negative
-        trend_y_list, trend = linear_regression(t=timestamps, y=counts_data)
+        trend_y_list, trend = linear_regression(X=timestamps, y=counts_data)
         resp_dict = {
             'timestamps': timestamps,
             'counts': counts_data,
@@ -233,6 +235,20 @@ def _convert_counts_interval_data(counts_raw_list):
         else:
             raise Exception(f"Invalid interval object provided.")
     return timestamps, counts_data
+
+
+def cache_in_advance():
+    while True:
+        _tweets_chart_request(chart_type='14d_at_1d')
+        _tweets_chart_request(chart_type='72hr_at_1hr')
+        top_retweets()
+        logging.info(f"Advance caching executed at {datetime.now()}")
+        time.sleep(10 * 60)
+
+
+sched = BackgroundScheduler(daemon=True)
+sched.add_job(cache_in_advance, 'interval', minutes=10)
+sched.start()
 
 
 if __name__ == "__main__":
