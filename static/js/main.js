@@ -274,7 +274,7 @@ function getLiveInfo() {
     spinnerId: "yang-day-loading",
     endpoint: "tweets_daily_chart",
     chartType: "line",
-    title: "# yang related tweets last 2 weeks (subject to data availability)",
+    title: "# yang related tweets last 2 weeks subject to data availability",
     color: 'yellow',
     xTickType: 'day',
     lastExclusive: true
