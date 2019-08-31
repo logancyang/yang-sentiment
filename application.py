@@ -287,9 +287,9 @@ def cache_in_advance():
         time.sleep(10 * 60)
 
 
-# sched = BackgroundScheduler(daemon=True)
-# sched.add_job(cache_in_advance, 'interval', minutes=10)
-# sched.start()
+sched = BackgroundScheduler(daemon=True)
+sched.add_job(cache_in_advance, 'interval', minutes=10)
+sched.start()
 
 
 if __name__ == "__main__":
