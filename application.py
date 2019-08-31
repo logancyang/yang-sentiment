@@ -69,7 +69,7 @@ def top_retweets():
     """Top retweeted tweet ids, refresh every 30min based on the query granularity"""
     colname = "retweeted_status_id_str"
     # Return top 10 retweeted tweet ids
-    query = query_retweet_count(colname, top_n=10)
+    query = query_retweet_count(colname, top_n=20)
     top_retweet_ids = []
 
     with SqliteDict('./cache.sqlite') as cache:
