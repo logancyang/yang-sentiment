@@ -55,7 +55,7 @@ function getColor(colorKey) {
   return colorSets[colorKey]
 }
 
-function _getxValues(data, xTickType, lastExclusive) {
+function _getTsValues(data, xTickType, lastExclusive) {
   const xValues = []
   let data_trimmed = data
   if (lastExclusive) {
@@ -70,7 +70,7 @@ function _getxValues(data, xTickType, lastExclusive) {
 }
 
 function _getyValues(data, lastExclusive) {
-  return lastExclusive ? data : data.slice(0, data.length - 1)
+  return lastExclusive ? data.slice(0, data.length - 1) : data
 }
 
 function _getTimeTick(xTick, xTickType) {
@@ -106,8 +106,9 @@ function _getMinMaxYValue(datasets) {
  * and turn into an array of {label, data, backgroundColor, borderColor, borderWidth}
  * @param {array} chartData chartData.data here is
  * {
- *   timestamps: [x, x, x, ...],
- *   counts: [y, y, ...],
+ *   timestamps: [x, x, x, ...] (optional)
+ *   xticks: [x, x, x, ...], (optional)
+ *   yticks: [y, y, ...],
  *   trendline: [y, y, y, ...],
  *   trend: 1, 0, -1
  * }
@@ -124,7 +125,10 @@ function fillChartDatasets(chartData, colors, xTickType, lastExclusive) {
       continue
     }
     if (key === 'timestamps') {
-      xlabels = _getxValues(chartDatum, xTickType, lastExclusive = lastExclusive)
+      xlabels = _getTsValues(chartDatum, xTickType, lastExclusive = lastExclusive)
+      continue
+    } else if (key === 'xticks') {
+      xlabels = chartDatum
       continue
     }
     let fill = true
@@ -179,7 +183,7 @@ function renderCharts(
       scales: {
         yAxes: [{
           ticks: {
-            suggestedMin: minyValue * 0.95,
+            suggestedMin: 0,
             suggestedMax: maxyValue * 1.05
           }
         }]
@@ -286,7 +290,7 @@ function getLiveInfo() {
     spinnerId: "yang-loc-loading",
     endpoint: "tweets_loc_chart",
     chartType: "bar",
-    title: "# yang related tweets last 2 weeks based on location (subject to data availability)",
+    title: "Top 15 states for yang related tweets last 2 weeks (subject to data availability)",
     color: 'purple',
     xTickType: 'location',
     lastExclusive: false

@@ -11,10 +11,12 @@ from sqlitedict import SqliteDict
 
 from constants import YANG_TERM
 from learning.regression import linear_regression
+from location_utils import map_raw_to_states
 from models import Tweet, Price
 from queries import (
     query_last_n, query_tweet_count, get_eastern_date_today,
-    query_count_nhr_at_xmin, query_count_14d_at_1d, query_retweet_count
+    query_count_nhr_at_xmin, query_count_14d_at_1d, query_retweet_count,
+    query_count_group_by_location
 )
 from settings import PORT, DB_USER, DB_PASSWORD, RDS_POSTGRES_ENDPOINT, DB_NAME
 
@@ -112,6 +114,15 @@ def tweets_daily_chart():
     return _tweets_chart_request(chart_type='14d_at_1d')
 
 
+@app.route('/tweets_loc_chart')
+def tweets_loc_chart():
+    """
+    Get the counts of tweets for the last 14 days at 1 day granularity
+    A total 14 data points including today
+    """
+    return _tweets_chart_request(chart_type='14d_for_loc')
+
+
 """Helpers"""
 
 
@@ -176,9 +187,16 @@ def _tweets_chart_request(chart_type, track_term=YANG_TERM):
             n_hours=72, x_mins=60, track_term=track_term,
             count_colname=count_colname, interval_colname=interval_colname)
         # logging.info(f"[72hr_at_1hr SQL]: {query}\n\n")
+    elif chart_type == '14d_for_loc':
+        interval_colname = 'location'
+        query = query_count_group_by_location(
+            track_term, count_colname=count_colname, interval_colname=interval_colname)
+        # logging.info(f"[14d_for_loc SQL]: {query}\n\n")
     else:
         raise Exception(f"chart_type is not supported: {chart_type} ")
 
+    # Query db, postprocess, cache[query] = postprocessed
+    resp_dict = {}
     try:
         with SqliteDict('./cache.sqlite') as cache:
             if query not in cache:
@@ -186,22 +204,15 @@ def _tweets_chart_request(chart_type, track_term=YANG_TERM):
                 counts_raw = db.session.query(
                     interval_colname, count_colname).from_statement(text(query)).all()
                 db.session.commit()
-                cache[query] = counts_raw
+                resp_dict = _postprocess_chart_data(counts_raw, chart_type)
+                cache[query] = resp_dict
                 cache.commit()
             else:
                 logging.info(f"Cache HIT: {query}")
-                counts_raw = cache[query]
+                resp_dict = cache[query]
         # Deploy the following line to staging if there's a date discrepancy at remote
-        # logging.info(f"[Query RESULT]: {counts_raw}\n\n")
-        timestamps, counts_data = _convert_counts_interval_data(counts_raw)
-        # trend_y_list: list of predicted value, trend: 0 for insignif, 1 for positive, -1 for negative
-        trend_y_list, trend = linear_regression(X=timestamps, y=counts_data)
-        resp_dict = {
-            'timestamps': timestamps,
-            'counts': counts_data,
-            'trendline': trend_y_list,
-            'trend': trend
-        }
+        # logging.info(f"[{chart_type} Query RESULT]: {counts_raw}\n\n")
+
         response = app.response_class(
             response=json.dumps(resp_dict),
             status=200,
@@ -213,7 +224,7 @@ def _tweets_chart_request(chart_type, track_term=YANG_TERM):
             f"An unexpected exception occurred during {chart_type} chart request: {e}\n")
     finally:
         with SqliteDict('./cache.sqlite') as cache:
-            if len(cache) >= 40:
+            if len(cache) >= 400:
                 cache.clear()
         db.session.close()
 
@@ -237,18 +248,48 @@ def _convert_counts_interval_data(counts_raw_list):
     return timestamps, counts_data
 
 
+def _get_counts_by_states(counts_raw):
+    state_hist, state_map = map_raw_to_states(counts_raw)
+    state, count = zip(*state_hist)
+    return state, count
+
+
+def _postprocess_chart_data(counts_raw, chart_type):
+    resp_dict = {}
+    if chart_type == '14d_for_loc':
+        # Note that less than 10% users have location, and in the 10%, the majority are either
+        # outside of US or use inaccurate info such as 'earth' or 'usa'.
+        states, counts = _get_counts_by_states(counts_raw)
+        resp_dict = {
+            'xticks': states,
+            'counts': counts
+        }
+    elif chart_type == '14d_at_1d' or chart_type == '72hr_at_1hr':
+        timestamps, counts_data = _convert_counts_interval_data(counts_raw)
+        # trend_y_list: list of predicted value, trend: 0 for insignif, 1 for positive, -1 for negative
+        trend_y_list, trend = linear_regression(X=timestamps, y=counts_data)
+        resp_dict = {
+            'timestamps': timestamps,
+            'counts': counts_data,
+            'trendline': trend_y_list,
+            'trend': trend
+        }
+    return resp_dict
+
+
 def cache_in_advance():
     while True:
         _tweets_chart_request(chart_type='14d_at_1d')
         _tweets_chart_request(chart_type='72hr_at_1hr')
+        _tweets_chart_request(chart_type='14d_for_loc')
         top_retweets()
         logging.info(f"Advance caching executed at {datetime.now()}")
         time.sleep(10 * 60)
 
 
-sched = BackgroundScheduler(daemon=True)
-sched.add_job(cache_in_advance, 'interval', minutes=10)
-sched.start()
+# sched = BackgroundScheduler(daemon=True)
+# sched.add_job(cache_in_advance, 'interval', minutes=10)
+# sched.start()
 
 
 if __name__ == "__main__":

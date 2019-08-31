@@ -41,7 +41,7 @@ def query_count_nhr_at_xmin(n_hours, x_mins, track_term, count_colname, interval
     )
 
 
-def query_count_14d_at_1d(coin_type, count_colname, interval_colname):
+def query_count_14d_at_1d(track_term, count_colname, interval_colname):
     n_days = 15
     dt_14d_ago = datetime.now() - timedelta(days=n_days)
     dt_14d_ago_local = timezone('US/Eastern').localize(dt_14d_ago)
@@ -53,8 +53,22 @@ def query_count_14d_at_1d(coin_type, count_colname, interval_colname):
             f"crypto_tweets ct "
             f"ON d.date = to_char(date_trunc('day', ct.created_at::timestamp "
             f"with time zone at time zone 'US/Eastern'), 'YYYY-MM-DD') "
-            f"WHERE ct.inserted_at::bigint >= {epochms_14d_ago} AND ct.track_term = '{coin_type}' "
+            f"WHERE ct.inserted_at::bigint >= {epochms_14d_ago} AND ct.track_term = '{track_term}' "
             f"GROUP BY d.date;")
+
+
+def query_count_group_by_location(track_term, count_colname, interval_colname='location'):
+    n_days = 14
+    dt_14d_ago = datetime.now() - timedelta(days=n_days)
+    dt_14d_ago_local = timezone('US/Eastern').localize(dt_14d_ago)
+    dt_14d_ago_localmidnight = dt_14d_ago_local.replace(hour=0, minute=0, second=0, microsecond=0)
+    epochms_14d_ago = dt_14d_ago_localmidnight.timestamp() * 1000
+    return (f"SELECT COUNT(*) {count_colname}, "
+            f"user_location AS {interval_colname} "
+            f"FROM crypto_tweets "
+            f"WHERE inserted_at::bigint >= {epochms_14d_ago} AND track_term = '{track_term}' "
+            f"AND user_location is not NULL "
+            f"GROUP BY user_location ORDER BY COUNT(*) DESC")
 
 
 def _query_count_period_at_granularity(

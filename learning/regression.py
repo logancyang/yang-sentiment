@@ -41,7 +41,7 @@ def _get_signif(coeff, pvalue):
         return 1
     return -1
 
-def _get_signif_delta(first, last, sensitivity=0.03):
+def _get_signif_delta(first, last, sensitivity=0.05):
     if last > first * (1 + sensitivity):
         return 1
     elif last < first * (1 - sensitivity):
