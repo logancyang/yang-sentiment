@@ -13,6 +13,7 @@ WORKDIR /app
 
 # pip install the local requirements.txt
 RUN pip install -r requirements.txt
+EXPOSE 7800
 
 # Define our command to be run when launching the container
 ENTRYPOINT ["sh", "./start.sh"]
