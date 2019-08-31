@@ -290,7 +290,7 @@ function getLiveInfo() {
     spinnerId: "yang-loc-loading",
     endpoint: "tweets_loc_chart",
     chartType: "bar",
-    title: "Top 15 states for yang related tweets last 2 weeks (subject to data availability)",
+    title: "Top 15 states for yang related tweets last 72hr (subject to data availability)",
     color: 'purple',
     xTickType: 'location',
     lastExclusive: false

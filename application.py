@@ -120,7 +120,7 @@ def tweets_loc_chart():
     Get the counts of tweets for the last 14 days at 1 day granularity
     A total 14 data points including today
     """
-    return _tweets_chart_request(chart_type='14d_for_loc')
+    return _tweets_chart_request(chart_type='72h_for_loc')
 
 
 """Helpers"""
@@ -187,11 +187,11 @@ def _tweets_chart_request(chart_type, track_term=YANG_TERM):
             n_hours=72, x_mins=60, track_term=track_term,
             count_colname=count_colname, interval_colname=interval_colname)
         # logging.info(f"[72hr_at_1hr SQL]: {query}\n\n")
-    elif chart_type == '14d_for_loc':
+    elif chart_type == '72h_for_loc':
         interval_colname = 'location'
         query = query_count_group_by_location(
-            track_term, count_colname=count_colname, interval_colname=interval_colname)
-        # logging.info(f"[14d_for_loc SQL]: {query}\n\n")
+            track_term, colname=interval_colname)
+        # logging.info(f"[72h_for_loc SQL]: {query}\n\n")
     else:
         raise Exception(f"chart_type is not supported: {chart_type} ")
 
@@ -256,7 +256,7 @@ def _get_counts_by_states(counts_raw):
 
 def _postprocess_chart_data(counts_raw, chart_type):
     resp_dict = {}
-    if chart_type == '14d_for_loc':
+    if chart_type == '72h_for_loc':
         # Note that less than 10% users have location, and in the 10%, the majority are either
         # outside of US or use inaccurate info such as 'earth' or 'usa'.
         states, counts = _get_counts_by_states(counts_raw)
@@ -281,7 +281,7 @@ def cache_in_advance():
     while True:
         _tweets_chart_request(chart_type='14d_at_1d')
         _tweets_chart_request(chart_type='72hr_at_1hr')
-        _tweets_chart_request(chart_type='14d_for_loc')
+        _tweets_chart_request(chart_type='72h_for_loc')
         top_retweets()
         logging.info(f"Advance caching executed at {datetime.now()}")
         time.sleep(10 * 60)

@@ -57,18 +57,18 @@ def query_count_14d_at_1d(track_term, count_colname, interval_colname):
             f"GROUP BY d.date;")
 
 
-def query_count_group_by_location(track_term, count_colname, interval_colname='location'):
-    n_days = 14
-    dt_14d_ago = datetime.now() - timedelta(days=n_days)
-    dt_14d_ago_local = timezone('US/Eastern').localize(dt_14d_ago)
-    dt_14d_ago_localmidnight = dt_14d_ago_local.replace(hour=0, minute=0, second=0, microsecond=0)
-    epochms_14d_ago = dt_14d_ago_localmidnight.timestamp() * 1000
-    return (f"SELECT COUNT(*) {count_colname}, "
-            f"user_location AS {interval_colname} "
+def query_count_group_by_location(track_term, colname='location', n_hours=72):
+    """Query top n retweeted tweet ids for the last n_hours, refresh every 30min"""
+    dt_nhr_ago = datetime.now() - timedelta(hours=n_hours)
+    hour_in_seconds = 60 * 60
+    epochms_nhr_ago = dt_nhr_ago.timestamp() // hour_in_seconds * hour_in_seconds * 1000
+    return (f"SELECT COUNT(*), user_location AS {colname} "
             f"FROM crypto_tweets "
-            f"WHERE inserted_at::bigint >= {epochms_14d_ago} AND track_term = '{track_term}' "
+            f"WHERE inserted_at::bigint >= {epochms_nhr_ago} "
+            f"AND track_term = '{track_term}' "
             f"AND user_location is not NULL "
-            f"GROUP BY user_location ORDER BY COUNT(*) DESC")
+            f"GROUP BY user_location "
+            f"ORDER BY COUNT(*) DESC")
 
 
 def _query_count_period_at_granularity(
