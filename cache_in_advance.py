@@ -14,7 +14,7 @@ def cache_in_advance():
         logging.info(f"Advance caching executed at {datetime.now()}")
         time.sleep(10 * 60)
 
-
-sched = BackgroundScheduler(daemon=True)
-sched.add_job(cache_in_advance, 'interval', minutes=10)
-sched.start()
+def start_advance_caching():
+    sched = BackgroundScheduler(daemon=True)
+    sched.add_job(cache_in_advance, 'interval', minutes=10)
+    sched.start()

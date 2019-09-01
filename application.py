@@ -2,8 +2,9 @@ import logging
 import time
 import json
 from datetime import datetime
-from flask import Flask, render_template, Response, stream_with_context
+from flask import Flask, render_template, Response, stream_with_context, send_file
 from flask_sqlalchemy import SQLAlchemy
+from io import BytesIO
 from pytz import timezone
 from sqlalchemy.sql import text
 from sqlitedict import SqliteDict
@@ -12,10 +13,11 @@ from constants import YANG_TERM
 from learning.regression import linear_regression
 from location_utils import map_raw_to_states
 from models import Tweet, Price
+from nlp.wordcloud_gen import generate_wordcloud
 from queries import (
     query_last_n, query_tweet_count, get_eastern_date_today,
     query_count_nhr_at_xmin, query_count_14d_at_1d, query_retweet_count,
-    query_count_group_by_location
+    query_count_group_by_location, query_all_tweets
 )
 from settings import PORT, DB_USER, DB_PASSWORD, RDS_POSTGRES_ENDPOINT, DB_NAME
 
@@ -23,7 +25,7 @@ from settings import PORT, DB_USER, DB_PASSWORD, RDS_POSTGRES_ENDPOINT, DB_NAME
 # pylint: disable=logging-fstring-interpolation
 # AWS Beanstalk needs it to be named 'application', and file 'application.py'
 application = app = Flask(__name__)
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 DB_URL = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{RDS_POSTGRES_ENDPOINT}:5432/{DB_NAME}"
 app.config['SQLALCHEMY_DATABASE_URI'] = DB_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -120,6 +122,37 @@ def tweets_loc_chart():
     A total 14 data points including today
     """
     return _tweets_chart_request(chart_type='72h_for_loc')
+
+
+"""Sentiment"""
+
+
+@app.route('/wordcloud')
+def wordcloud():
+    """
+    Get the word cloud for tweets in the last 24 hours
+    """
+    # Query tweets in the last 24 hours, refresh at 1 hour
+    # Cache the generated image
+    query = query_all_tweets()
+    with SqliteDict('./cache.sqlite') as cache:
+        if query not in cache:
+            logging.info(f"Cache MISS: {query}")
+            tweet_objs = db.session.query(Tweet).from_statement(text(query)).all()
+            db.session.commit()
+            logging.info(f"Wordcloud query completed.")
+            wc = generate_wordcloud(tweet_objs)
+            logging.info(f"Wordcloud generation completed.")
+            cache[query] = wc
+            cache.commit()
+        else:
+            logging.info(f"Cache HIT: {query}")
+            top_retweet_ids = cache[query]
+
+    img = BytesIO()
+    wc.to_image().save(img, 'PNG')
+    img.seek(0)
+    return send_file(img, mimetype='image/png')
 
 
 """Helpers"""

@@ -254,6 +254,15 @@ async function getTopTweets(spinnerId) {
   }
 }
 
+async function getWordCloud(wordCloudElementId) {
+  const image = document.getElementById(wordCloudElementId)
+  const downloadingImage = new Image();
+  downloadingImage.onload = function(){
+    image.src = this.src;
+  };
+  downloadingImage.src = "/wordcloud"
+}
+
 function getLiveInfo() {
   getYangTweetCount()
   getTweetStream()
@@ -295,6 +304,8 @@ function getLiveInfo() {
     xTickType: 'location',
     lastExclusive: false
   })
+
+  const wordCloud24h = getWordCloud('wordcloud')
 
   // renderCharts('day-count-line', chartData=myChartData, colors=['blue', 'yellow'])
   // renderCharts('loc-count-hist', chartData=myChartData, colors=['purple', 'orange'])

@@ -14,6 +14,17 @@ def query_tweet_count(track_term, created_date):
             f"created_date = '{created_date}';")
 
 
+def query_all_tweets(track_term=YANG_TERM):
+    """All tweets in the last 6hr at 6hr refresh, excluding retweets"""
+    dt_ago = datetime.now() - timedelta(hours=6)
+    refresh_in_seconds = 6 * 60 * 60
+    epochms_ago = dt_ago.timestamp() // refresh_in_seconds * refresh_in_seconds * 1000
+    return (f"SELECT * "
+            f"FROM crypto_tweets "
+            f"WHERE inserted_at::bigint >= {epochms_ago} AND track_term = '{track_term}' "
+            f"AND retweeted_status_id_str is NULL")
+
+
 def query_retweet_count(colname='retweeted_status_id_str', track_term='andrewyang', top_n=10, n_hours=6):
     """Query top n retweeted tweet ids for the last n_hours, refresh every 30min"""
     dt_nhr_ago = datetime.now() - timedelta(hours=n_hours)

@@ -131,7 +131,7 @@
         </li>
         <li class="nav-item">
           <a class="nav-link" id="pills-sentiment-tab" data-toggle="pill" href="#pills-sentiment" role="tab"
-            aria-controls="pills-sentiment" aria-selected="false">Sentiment Analysis (coming soon)</a>
+            aria-controls="pills-sentiment" aria-selected="false">Sentiment Analysis (beta)</a>
         </li>
       </ul>
 
@@ -228,11 +228,17 @@
 
         <div class="tab-pane fade" id="pills-sentiment" role="tabpanel" aria-labelledby="pills-sentiment-tab">
           <p style="text-align: center;">
-            Coming soon, stay tuned!
+            Word cloud for Yang-related tweets in the last 6 hours (may take a while to load)
           </p>
+
           <div class="row-4">
-            <canvas id="sentiment-minute-count-line" height="250"></canvas>
+            <img id="wordcloud"
+              width="900", height="450" style="display: block;margin-left: auto;margin-right: auto;"></img>
           </div>
+          <br/>
+          <p style="text-align: center;">
+            More coming soon, stay tuned!
+          </p>
           <div class="row-4">
             <canvas id="sentiment-day-count-line" height="250"></canvas>
           </div>
