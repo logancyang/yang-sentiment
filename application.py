@@ -1,7 +1,6 @@
 import logging
 import time
 import json
-from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime
 from flask import Flask, render_template, Response, stream_with_context
 from flask_sqlalchemy import SQLAlchemy
@@ -275,21 +274,6 @@ def _postprocess_chart_data(counts_raw, chart_type):
             'trend': trend
         }
     return resp_dict
-
-
-def cache_in_advance():
-    while True:
-        _tweets_chart_request(chart_type='14d_at_1d')
-        _tweets_chart_request(chart_type='72hr_at_1hr')
-        _tweets_chart_request(chart_type='72h_for_loc')
-        top_retweets()
-        logging.info(f"Advance caching executed at {datetime.now()}")
-        time.sleep(10 * 60)
-
-
-sched = BackgroundScheduler(daemon=True)
-sched.add_job(cache_in_advance, 'interval', minutes=10)
-sched.start()
 
 
 if __name__ == "__main__":
