@@ -11,7 +11,7 @@ CUSTOM_STOPWORDS = [
     'actually', 'dude', 'yanggang', 'yang', 'need', 'lol', 'thank', 'thanks',
     'got', 'andrew', 'want', 'year', 'years', 'month', 'know', 'think',
     'thing', 'things', 'saying', 'guy', 'amp', 'yes', 'way', 'said', 'let',
-    'talking', 'hey', 'yeah', 'gang', 'time', 'come', 'mean'
+    'talking', 'hey', 'yeah', 'gang', 'time', 'come', 'mean', 'fuck', 'says'
 ]
 
 
