@@ -147,12 +147,13 @@ def wordcloud():
             cache.commit()
         else:
             logging.info(f"Cache HIT: {query}")
-            top_retweet_ids = cache[query]
+            wc = cache[query]
 
-    img = BytesIO()
-    wc.to_image().save(img, 'PNG')
-    img.seek(0)
-    return send_file(img, mimetype='image/png')
+    if wc:
+        img = BytesIO()
+        wc.to_image().save(img, 'PNG')
+        img.seek(0)
+        return send_file(img, mimetype='image/png')
 
 
 """Helpers"""
