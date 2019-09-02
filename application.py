@@ -153,6 +153,7 @@ def wordcloud():
         img = BytesIO()
         wc.to_image().save(img, 'PNG')
         img.seek(0)
+        logging.info(f"Word cloud image sent: {wc}")
         return send_file(img, mimetype='image/png')
 
 
