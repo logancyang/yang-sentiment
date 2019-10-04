@@ -1,6 +1,7 @@
 import logging
 import time
 import json
+import pickle
 from datetime import datetime
 from flask import Flask, render_template, Response, stream_with_context, send_file
 from flask_sqlalchemy import SQLAlchemy
@@ -12,6 +13,7 @@ from sqlitedict import SqliteDict
 from constants import YANG_TERM
 from learning.regression import linear_regression
 from location_utils import map_raw_to_states
+from redisclient import r as cache
 from models import Tweet, Price
 from nlp.wordcloud_gen import generate_wordcloud
 from queries import (
@@ -73,17 +75,15 @@ def top_retweets():
     query = query_retweet_count(colname, top_n=20)
     top_retweet_ids = []
 
-    with SqliteDict('./cache.sqlite') as cache:
-        if query not in cache:
-            logging.info(f"Cache MISS: {query}")
-            top_retweet_ids_raw = db.session.query(colname).from_statement(text(query)).all()
-            top_retweet_ids = [tup[0] for tup in top_retweet_ids_raw]
-            db.session.commit()
-            cache[query] = top_retweet_ids
-            cache.commit()
-        else:
-            logging.info(f"Cache HIT: {query}")
-            top_retweet_ids = cache[query]
+    if not cache.get(query):
+        logging.info(f"Cache MISS: {query}")
+        top_retweet_ids_raw = db.session.query(colname).from_statement(text(query)).all()
+        top_retweet_ids = [tup[0] for tup in top_retweet_ids_raw]
+        db.session.commit()
+        cache.set(query, json.dumps(top_retweet_ids))
+    else:
+        logging.info(f"Cache HIT: {query}")
+        top_retweet_ids = json.loads(cache.get(query))
 
     response = app.response_class(
             response=json.dumps(top_retweet_ids),
@@ -130,24 +130,24 @@ def tweets_loc_chart():
 @app.route('/wordcloud')
 def wordcloud():
     """
-    Get the word cloud for tweets in the last 24 hours
+    Get the word cloud for tweets in the last 6 hours
     """
-    # Query tweets in the last 24 hours, refresh at 1 hour
+    # Query tweets in the last 6 hours, refresh at 1 hour
     # Cache the generated image
     query = query_all_tweets()
-    with SqliteDict('./cache.sqlite') as cache:
-        if query not in cache:
-            logging.info(f"Cache MISS: {query}")
-            tweet_objs = db.session.query(Tweet).from_statement(text(query)).all()
-            db.session.commit()
-            logging.info(f"Wordcloud query completed.")
-            wc = generate_wordcloud(tweet_objs)
-            logging.info(f"Wordcloud generation completed.")
-            cache[query] = wc
-            cache.commit()
-        else:
-            logging.info(f"Cache HIT: {query}")
-            wc = cache[query]
+
+    if not cache.get(query):
+        logging.info(f"Cache MISS: {query}")
+        tweets = db.session.query('tweet_text').from_statement(text(query)).all()
+        db.session.commit()
+        logging.info(f"Wordcloud query completed.")
+        wc = generate_wordcloud(tweets)
+        logging.info(f"Wordcloud generation completed.")
+        wcp = pickle.dumps(wc)
+        cache.set(query, wcp)
+    else:
+        logging.info(f"Cache HIT: {query}")
+        wc = pickle.loads(cache.get(query))
 
     if wc:
         img = BytesIO()
@@ -229,21 +229,19 @@ def _tweets_chart_request(chart_type, track_term=YANG_TERM):
     else:
         raise Exception(f"chart_type is not supported: {chart_type} ")
 
-    # Query db, postprocess, cache[query] = postprocessed
+    # Query db, postprocess, cache.set(query, postprocessed)
     resp_dict = {}
     try:
-        with SqliteDict('./cache.sqlite') as cache:
-            if query not in cache:
-                logging.info(f"Cache MISS: {query}")
-                counts_raw = db.session.query(
-                    interval_colname, count_colname).from_statement(text(query)).all()
-                db.session.commit()
-                resp_dict = _postprocess_chart_data(counts_raw, chart_type)
-                cache[query] = resp_dict
-                cache.commit()
-            else:
-                logging.info(f"Cache HIT: {query}")
-                resp_dict = cache[query]
+        if not cache.get(query):
+            logging.info(f"Cache MISS: {query}")
+            counts_raw = db.session.query(
+                interval_colname, count_colname).from_statement(text(query)).all()
+            db.session.commit()
+            resp_dict = _postprocess_chart_data(counts_raw, chart_type)
+            cache.set(query, json.dumps(resp_dict))
+        else:
+            logging.info(f"Cache HIT: {query}")
+            resp_dict = json.loads(cache.get(query))
         # Deploy the following line to staging if there's a date discrepancy at remote
         # logging.info(f"[{chart_type} Query RESULT]: {counts_raw}\n\n")
 
@@ -257,9 +255,8 @@ def _tweets_chart_request(chart_type, track_term=YANG_TERM):
         logging.error(
             f"An unexpected exception occurred during {chart_type} chart request: {e}\n")
     finally:
-        with SqliteDict('./cache.sqlite') as cache:
-            if len(cache) >= 400:
-                cache.clear()
+        if len(cache.keys()) >= 400:
+            cache.flushall()
         db.session.close()
 
 

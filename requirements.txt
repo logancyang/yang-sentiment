@@ -10,9 +10,9 @@ gunicorn
 matplotlib
 numpy
 psycopg2-binary
-python-binary-memcached
 python-dotenv
 pytz
+redis
 scikit-learn
 SQLAlchemy
 sqlitedict

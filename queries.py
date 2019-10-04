@@ -19,7 +19,7 @@ def query_all_tweets(track_term=YANG_TERM):
     dt_ago = datetime.now() - timedelta(hours=6)
     refresh_in_seconds = 6 * 60 * 60
     epochms_ago = dt_ago.timestamp() // refresh_in_seconds * refresh_in_seconds * 1000
-    return (f"SELECT * "
+    return (f"SELECT tweet_text "
             f"FROM crypto_tweets "
             f"WHERE inserted_at::bigint >= {epochms_ago} AND track_term = '{track_term}' "
             f"AND retweeted_status_id_str is NULL")

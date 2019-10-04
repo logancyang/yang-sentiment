@@ -1,4 +1,6 @@
+import logging
 import random
+import time
 from collections import Counter
 
 import wordcloud
@@ -52,17 +54,23 @@ def _remove_stopwords(tokens, stopwords):
     return ' '.join(txt_no_stop)
 
 
-def generate_wordcloud(tweet_objs):
-    text = _join_tweets(tweet_objs)
+def generate_wordcloud(tweets):
+    logging.info(f"Wordcloud: processing starts for {len(tweets)} tweets.")
+    t0 = time.perf_counter()
+    text = _join_tweets(tweets)
+
     stops = _get_stopwords(CUSTOM_STOPWORDS)
     cleaned = _clean_tweet_specs(text)
     tokens = _tokenize(cleaned)
     txt_no_stop = _remove_stopwords(tokens, stops)
+
     wc = wordcloud.WordCloud(
             background_color="white",
             max_words=900,
             width=900,
             height=450
         ).generate(txt_no_stop)
+    t1 = time.perf_counter() - t0
+    logging.info(f"Wordcloud: done processing, took {t1} seconds.")
     return wc
 
