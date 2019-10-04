@@ -153,7 +153,7 @@ def wordcloud():
 
     if img:
         img.seek(0)
-        logging.info(f"Word cloud image sent: {wc}")
+        logging.info(f"Word cloud image sent.")
         return send_file(img, mimetype='image/png')
 
 
