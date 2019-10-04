@@ -143,15 +143,15 @@ def wordcloud():
         logging.info(f"Wordcloud query completed.")
         wc = generate_wordcloud(tweets)
         logging.info(f"Wordcloud generation completed.")
-        wcp = pickle.dumps(wc)
-        cache.set(query, wcp)
-    else:
-        logging.info(f"Cache HIT: {query}")
-        wc = pickle.loads(cache.get(query))
-
-    if wc:
         img = BytesIO()
         wc.to_image().save(img, 'PNG')
+        imgp = pickle.dumps(img)
+        cache.set(query, imgp)
+    else:
+        logging.info(f"Cache HIT: {query}")
+        img = pickle.loads(cache.get(query))
+
+    if img:
         img.seek(0)
         logging.info(f"Word cloud image sent: {wc}")
         return send_file(img, mimetype='image/png')
