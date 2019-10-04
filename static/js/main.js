@@ -234,7 +234,9 @@ function _getTweet(tweetId, tweetElementId) {
       conversation : 'none',    // or all
       cards        : 'visible',  // or hidden
       linkColor    : '#cc0000', // default is blue
-      theme        : 'light'    // or dark
+      theme        : 'light',    // or dark
+      align        : 'center',
+      width        : 550
     })
 }
 
