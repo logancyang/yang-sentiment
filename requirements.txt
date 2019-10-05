@@ -17,6 +17,7 @@ scikit-learn
 SQLAlchemy
 sqlitedict
 tweet-preprocessor
+TwitterAPI
 tzlocal
 urllib3
 us
