@@ -1,5 +1,9 @@
+import sys
+sys.path.append(".")
+
 from datetime import datetime
 from apscheduler.schedulers.blocking import BlockingScheduler
+
 from datajobs import ScheduledJob
 
 
