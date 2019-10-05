@@ -5,10 +5,7 @@ from flask import Flask, render_template, Response, stream_with_context, send_fi
 from flask_sqlalchemy import SQLAlchemy
 
 from constants import YANG_TERM
-from query_funcs import (
-    get_top_retweets, tweets_chart_request, query_all_tweets,
-    count_stream, latest_tweet_stream, get_wordcloud
-)
+from datajobs import ScheduledJob, StreamJob
 from settings import PORT, DB_USER, DB_PASSWORD, RDS_POSTGRES_ENDPOINT, DB_NAME
 
 
@@ -42,7 +39,7 @@ def about():
 @app.route('/yangcount')
 def yangcount():
     return Response(
-        stream_with_context(count_stream(YANG_TERM)),
+        stream_with_context(StreamJob.count_stream(YANG_TERM)),
         mimetype='text/event-stream'
     )
 
@@ -50,7 +47,7 @@ def yangcount():
 @app.route('/latest_tweets')
 def latest_tweets():
     return Response(
-        stream_with_context(latest_tweet_stream(n=5)),
+        stream_with_context(StreamJob.latest_tweet_stream(n=5)),
         mimetype='text/event-stream'
     )
 
@@ -58,7 +55,7 @@ def latest_tweets():
 @app.route('/top_retweets')
 def top_retweets():
     """Top retweeted tweet ids, refresh every 30min based on the query granularity"""
-    top_retweet_ids = get_top_retweets()
+    top_retweet_ids = ScheduledJob.get_top_retweets()
     response = app.response_class(
             response=json.dumps(top_retweet_ids),
             status=200,
@@ -76,7 +73,7 @@ def tweets_min_chart():
     Get the counts of tweets for the last 6hr at 5min granularity
     A total 72 data points - the last 5 min = 71 data points
     """
-    return tweets_chart_request(chart_type='72hr_at_1hr')
+    return ScheduledJob.tweets_chart_request(chart_type='72hr_at_1hr')
 
 
 # pylint: disable=no-member
@@ -86,7 +83,7 @@ def tweets_daily_chart():
     Get the counts of tweets for the last 14 days at 1 day granularity
     A total 14 data points including today
     """
-    return tweets_chart_request(chart_type='14d_at_1d')
+    return ScheduledJob.tweets_chart_request(chart_type='14d_at_1d')
 
 
 @app.route('/tweets_loc_chart')
@@ -95,7 +92,7 @@ def tweets_loc_chart():
     Get the counts of tweets for the last 14 days at 1 day granularity
     A total 14 data points including today
     """
-    return tweets_chart_request(chart_type='72h_for_loc')
+    return ScheduledJob.tweets_chart_request(chart_type='72h_for_loc')
 
 
 """Sentiment"""
@@ -108,7 +105,7 @@ def wordcloud():
     """
     # Query tweets in the last 6 hours, refresh at 1 hour
     # Cache the generated image
-    img = get_wordcloud()
+    img = ScheduledJob.get_wordcloud()
 
     if img:
         img.seek(0)
