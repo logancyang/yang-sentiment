@@ -9,7 +9,7 @@ from datajobs import ScheduledJob
 
 sched = BlockingScheduler()
 
-@sched.scheduled_job('interval', minutes=1)
+@sched.scheduled_job('interval', minutes=5)
 def cache_in_advance():
     print(f"Scheduled job: executing...")
     ScheduledJob.tweets_chart_request(chart_type='14d_at_1d')
