@@ -5,11 +5,13 @@ from constants import YANG_TERM
 
 
 def query_last_n(tablename, n=5, track_term=YANG_TERM):
+    """Query the last n tweets with track_term"""
     return (f"SELECT * FROM {tablename} WHERE track_term = '{track_term}' "
             f"ORDER BY id DESC LIMIT {str(n)};")
 
 
 def query_tweet_count(track_term, created_date):
+    """Query the tweet count for the current day (US eastern time)"""
     return (f"SELECT tweet_count FROM tweet_daily_count WHERE track_term = '{track_term}' AND "
             f"created_date = '{created_date}';")
 
