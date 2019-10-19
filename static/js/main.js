@@ -291,7 +291,7 @@ function getLiveInfo() {
     title: "# yang related tweets last 2 weeks (subject to data availability)",
     color: 'yellow',
     xTickType: 'day',
-    lastExclusive: true
+    lastExclusive: false
   })
 
   // TODO: Implement location hist for last 2 weeks data

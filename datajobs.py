@@ -62,7 +62,7 @@ class ScheduledJob(DataJob):
         if chart_type == '14d_at_1d':
             query = query_count_14d_at_1d(
                 track_term, count_colname=count_colname, interval_colname=interval_colname)
-            # logging.info(f"[14d_at_1d SQL]: {query}")
+            # logging.info(f"\nDEBUG:\ncurrent ts: {time.time()}\n[14d_at_1d SQL]: {query}\n")
         elif chart_type == '72hr_at_1hr':
             query = query_count_nhr_at_xmin(
                 n_hours=72, x_mins=60, track_term=track_term,
@@ -97,7 +97,9 @@ class ScheduledJob(DataJob):
             logging.error(
                 f"An unexpected exception occurred during {chart_type} chart request: {e}\n")
         finally:
-            if len(cache.keys()) >= 400:
+            # Each run is 5min, clear cache every 100 runs -> ~8hrs to avoid strange
+            # stale result for groupby date charts
+            if len(cache.keys()) >= 100:
                 cache.flushall()
             cls.Session.close()
 
